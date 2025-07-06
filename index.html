@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omega Miner GUI</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #fff, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #cccccc;
+            font-size: 1.1em;
+        }
+
+        .wallet-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .wallet-section h2 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .wallet-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #fff, #fff);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff4444, #cc0000);
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 68, 68, 0.3);
+        }
+
+        .wallet-info {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .wallet-info h3 {
+            color: #00ccff;
+            margin-bottom: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #cccccc;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            border: 1px solid #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .private-key-section {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .private-key-section h4 {
+            color: #fff;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .reveal-btn {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            border: 1px solid #fff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .reveal-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .private-key-value {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #ff4444;
+            word-break: break-all;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .import-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #cccccc;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.2);
+        }
+
+        .form-group input::placeholder {
+            color: #666666;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: #00ff88;
+        }
+
+        .status.error {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            color: #ff4444;
+        }
+
+        .status.info {
+            background: rgba(0, 204, 255, 0.1);
+            border: 1px solid rgba(0, 204, 255, 0.3);
+            color: #00ccff;
+        }
+
+        .status.warning {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            color: #ffc107;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .faucet-section {
+            background: rgba(0, 153, 255, 0.1);
+            border: 1px solid rgba(0, 153, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .faucet-section h4 {
+            color: #0099ff;
+            margin-bottom: 10px;
+        }
+
+        .faucet-info {
+            color: #cccccc;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #00ff88;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card h3 {
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .balance-display {
+            font-size: 2em;
+            font-weight: bold;
+            color: #fff;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .balance-label {
+            text-align: center;
+            color: #cccccc;
+            font-size: 0.9em;
+        }
+
+        .step-label {
+            color: #fff;
+            font-size: 12px;
+            font-weight: normal;
+            margin-top: 4px;
+            margin-bottom: 0;
+            text-align: center;
+            display: block;
+        }
+
+        .mining-actions-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: flex-end;
+            gap: 18px;
+            margin-top: 8px;
+        }
+        .mining-steps-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: flex-start;
+            gap: 18px;
+            margin-top: 2px;
+            margin-bottom: 0;
+        }
+        .mining-steps-row .step-label {
+            min-width: 110px;
+            text-align: center;
+            margin-top: 0;
+        }
+        .centered-action-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 18px;
+        }
+        .mining-actions-row-flex {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 24px;
+            margin-top: 8px;
+        }
+        .action-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-width: 140px;
+        }
+        .action-col .btn {
+            width: 100%;
+            min-width: 120px;
+            max-width: 200px;
+        }
+        .step-label {
+            color: #fff;
+            font-size: 12px;
+            font-weight: normal;
+            margin-top: 6px;
+            margin-bottom: 0;
+            text-align: center;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Ω Omega Miner</h1>
+            <p class="subtitle">Mine in 4 Simple Steps</p>
+        </div>
+
+        <!-- Wallet Connection Section -->
+        <div class="wallet-section">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <h2>🔗 Wallet Connection</h2>
+                <button id="walletCollapseBtn" style="background:none;border:none;cursor:pointer;font-size:1.7em;color:#fff;outline:none;transition:transform 0.2s;" title="Collapse/Expand Wallet Info">▼</button>
+            </div>
+            <div class="wallet-buttons">
+                <button class="btn btn-primary" onclick="connectMetaMask()">
+                    🔗 Connect MetaMask
+                </button>
+                <button class="btn btn-secondary" onclick="createOmegaWallet()">
+                    🆕 Create Omega Wallet
+                </button>
+                <button class="btn btn-secondary" onclick="showImportSection()">
+                    📥 Import Private Key
+                </button>
+                <button class="btn btn-danger" onclick="disconnectWallet()">
+                    🔌 Disconnect
+                </button>
+            </div>
+
+            <!-- Wallet Info Display -->
+            <div id="walletInfo" class="wallet-info hidden">
+                <h3>📋 Wallet Information</h3>
+                <div class="info-row">
+                    <span class="info-label">Status:</span>
+                    <span class="info-value" id="walletStatus">Connected</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Address:</span>
+                    <span class="info-value" id="walletAddress">-</span>
+                    <button class="copy-btn" onclick="copyToClipboard('walletAddress')">Copy</button>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Balance:</span>
+                    <span class="info-value" id="walletBalance">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Network:</span>
+                    <span class="info-value" id="walletNetwork">-</span>
+                </div>
+
+                <!-- Private Key Section (for Omega Wallet) -->
+                <div id="privateKeySection" class="private-key-section hidden">
+                    <h4>🔑 Private Key (Save This!)</h4>
+                    <p style="color: #ff6666; font-size: 0.9em; margin-bottom: 10px;">
+                        ⚠️ Save this private key to restore your wallet later. Never share it with anyone!
+                    </p>
+                    <button class="reveal-btn" onclick="togglePrivateKey()" id="revealBtn">
+                        👁️ Click to Reveal Private Key
+                    </button>
+                    <div class="private-key-value" id="privateKeyValue"></div>
+                </div>
+
+                <!-- Faucet Section -->
+                <div class="faucet-section">
+                    <h4>🚰 Faucet</h4>
+                    <div class="faucet-info">
+                        Get free OMEGA tokens for testing. Each wallet can claim once every 24 hours.
+                    </div>
+                    <button class="btn btn-primary" onclick="claimFromFaucet()" style="margin-top: 10px;">
+                        💰 Claim from Faucet
+                    </button>
+                    <button class="btn btn-secondary" onclick="showFaucetStatus()" style="margin-top: 10px;">
+                        🕒 Faucet Status
+                    </button>
+                    <div id="faucetStatusMsg" style="margin-top:10px;"></div>
+                </div>
+            </div>
+
+            <!-- Import Private Key Section -->
+            <div id="importSection" class="import-section hidden">
+                <h3>📥 Import Private Key</h3>
+                <div class="form-group">
+                    <label for="privateKeyInput">Private Key:</label>
+                    <input type="password" id="privateKeyInput" placeholder="Enter your private key (with or without 0x prefix)">
+                </div>
+                <button class="btn btn-primary" onclick="importPrivateKey()">
+                    🔓 Import Wallet
+                </button>
+                <button class="btn btn-secondary" onclick="hideImportSection()">
+                    ❌ Cancel
+                </button>
+            </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="statusContainer"></div>
+
+        <!-- Mining Section -->
+        <div class="wallet-section">
+            <h2>⛏️ Mining</h2>
+            <div id="miningStatusPanel" style="display:none;justify-content:center;align-items:center;text-align:center;margin-bottom:20px;">
+                <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:24px 32px;min-width:340px;max-width:90vw;box-shadow:0 2px 16px 0 rgba(0,0,0,0.12);font-family:'Courier New',monospace;font-size:1.1em;">
+                    <div id="miningHashLine">mining hash: <span id="miningHashValue">-</span></div>
+                    <div id="cpuLine">cpu usage: <span id="cpuValue">-</span></div>
+                    <div id="ramLine">ram usage: <span id="ramValue">-</span></div>
+                    <div id="elecLine">electricity usage: <span id="elecValue">-</span></div>
+                </div>
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <h3>💻 Virtual Rig</h3>
+                    <div class="balance-display" id="miningBalance">0.0000</div>
+                    <div class="balance-label">OMEGA</div>
+                    <div class="centered-action-group">
+                        <button class="btn btn-primary" onclick="fundMiningWallet()">
+                            💸 Fund Virtual Rig
+                        </button>
+                        <span class="step-label">Step 1</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>📊 Statistics</h3>
+                    <div class="info-row">
+                        <span class="info-label">Blocks Mined:</span>
+                        <span class="info-value" id="blocksMined">0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Total Earned:</span>
+                        <span class="info-value" id="totalEarned">0.0000 OMEGA</span>
+                    </div>
+                    <div class="mining-actions-row-flex">
+                        <div class="action-col">
+                            <button class="btn btn-primary" onclick="startMining()">
+                                🚀 Start Mining
+                            </button>
+                            <span class="step-label">Step 2</span>
+                        </div>
+                        <div class="action-col">
+                            <button class="btn btn-danger" onclick="stopMining()">
+                                ⏹️ Stop Mining
+                            </button>
+                            <span class="step-label">Step 3</span>
+                        </div>
+                        <div class="action-col">
+                            <button class="btn btn-secondary" onclick="claimMiningRewards()">
+                                🏆 Claim Rewards
+                            </button>
+                            <span class="step-label">Step 4</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add falling binary canvas overlays -->
+    <canvas id="leftMatrixCanvas" style="position:fixed;left:0;top:0;width:80px;height:100vh;pointer-events:none;z-index:100;display:none;"></canvas>
+    <canvas id="rightMatrixCanvas" style="position:fixed;right:0;top:0;width:80px;height:100vh;pointer-events:none;z-index:100;display:none;"></canvas>
+
+    <script>
+        // Robust ethers.js loader (from omega-miner.html)
+        function loadEthers() {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    if (typeof ethers !== 'undefined') {
+                        resolve(ethers);
+                        return;
+                    }
+                    const cdnSources = [
+                        'https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js',
+                        'https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js'
+                    ];
+                    let currentSource = 0;
+                    function tryNextSource() {
+                        if (currentSource >= cdnSources.length) {
+                            loadEthersFallback();
+                            resolve(ethers);
+                            return;
+                        }
+                        const script = document.createElement('script');
+                        script.src = cdnSources[currentSource];
+                        script.onload = () => {
+                            if (typeof ethers !== 'undefined') {
+                                resolve(ethers);
+                            } else {
+                                currentSource++;
+                                tryNextSource();
+                            }
+                        };
+                        script.onerror = () => {
+                            currentSource++;
+                            tryNextSource();
+                        };
+                        document.head.appendChild(script);
+                    }
+                    tryNextSource();
+                }, 500);
+            });
+        }
+        function loadEthersFallback() {
+            window.ethers = {
+                providers: {
+                    Web3Provider: function(provider) {
+                        this.provider = provider;
+                        this.getSigner = () => ({
+                            getAddress: () => Promise.resolve('0x0000000000000000000000000000000000000000'),
+                            sendTransaction: () => Promise.reject(new Error('Fallback ethers - no real transactions'))
+                        });
+                        this.getGasPrice = () => Promise.resolve({ toString: () => '20000000000' });
+                        this.getBalance = () => Promise.resolve({ isZero: () => true });
+                        this.getTransactionCount = () => Promise.resolve(0);
+                    }
+                },
+                Contract: function(address, abi, signer) {
+                    this.address = address;
+                    this.abi = abi;
+                    this.signer = signer;
+                    this.startMining = () => Promise.resolve({ wait: () => Promise.resolve() });
+                    this.claimRewards = () => Promise.resolve({ wait: () => Promise.resolve() });
+                },
+                Wallet: {
+                    createRandom: function() {
+                        return {
+                            address: '0x' + Math.random().toString(16).substr(2, 40),
+                            privateKey: '0x' + Math.random().toString(16).substr(2, 64),
+                            connect: function(provider) { return this; },
+                            sendTransaction: function(tx) {
+                                return Promise.resolve({
+                                    hash: '0x' + Math.random().toString(16).substr(2, 64),
+                                    wait: () => Promise.resolve()
+                                });
+                            }
+                        };
+                    }
+                },
+                utils: {
+                    formatEther: (wei) => (parseInt(wei) / 1e18).toString(),
+                    parseEther: (ether) => (parseFloat(ether) * 1e18).toString(),
+                    id: (text) => '0x' + Math.random().toString(16).substr(2, 64),
+                    defaultAbiCoder: {
+                        decode: () => ['0x0000000000000000000000000000000000000000', '1000000000000000000', '1']
+                    },
+                    hexDataSlice: (data, start) => data
+                }
+            };
+        }
+
+        // Global variables
+        let provider = null;
+        let signer = null;
+        let wallet = null;
+        let isConnected = false;
+        let isMining = false;
+        let miningWallet = null;
+        let miningInterval = null;
+        let mineCount = 0;
+
+        // Contract addresses and ABIs
+        const CONTRACT_ADDRESS = "0x54c731627f2d2b55267b53e604c869ab8e6a323b";
+        const FAUCET_ADDRESS = "0xf8e00f8cfaccf9b95f703642ec589d1c6ceee1a9";
+        const CONTRACT_ABI = [
+            "function mineBlock(uint256 nonce, bytes32 solution) external",
+            "function claimRewards() external",
+            "function claimTo(address recipient) external",
+            "function getMinerInfo(address miner) external view returns (uint256 _totalMined, uint256 _lastMineTime, uint256 _pendingRewards)",
+            "function calculateReward(address miner, uint256 nonce, bytes32 solution) external view returns (uint256)",
+            "function cooldownPeriod() external view returns (uint256)",
+            "function totalRewardsDistributed() external view returns (uint256)",
+            "function owner() external view returns (address)",
+            "function setCooldownPeriod(uint256 _cooldown) external",
+            "function withdrawExcess() external",
+            "event BlockMined(address indexed miner, uint256 nonce, bytes32 solution, uint256 reward)",
+            "event RewardsClaimed(address indexed miner, uint256 amount)"
+        ];
+        const FAUCET_ABI = [
+            {
+                "inputs": [],
+                "name": "claim",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    { "internalType": "address", "name": "user", "type": "address" }
+                ],
+                "name": "getFaucetStatus",
+                "outputs": [
+                    { "internalType": "bool", "name": "canClaimNow", "type": "bool" },
+                    { "internalType": "uint256", "name": "lastClaim", "type": "uint256" },
+                    { "internalType": "uint256", "name": "timeUntilNextClaim", "type": "uint256" },
+                    { "internalType": "uint256", "name": "claimAmount", "type": "uint256" },
+                    { "internalType": "uint256", "name": "faucetBalance", "type": "uint256" },
+                    { "internalType": "uint256", "name": "totalClaims_", "type": "uint256" }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            window.ethers = await loadEthers();
+            checkConnection();
+        });
+
+        // Check if MetaMask is connected
+        async function checkConnection() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        await connectMetaMask();
+                    }
+                } catch (error) {
+                    console.log('No MetaMask connection found');
+                }
+            }
+        }
+
+        // Connect to MetaMask
+        async function connectMetaMask() {
+            try {
+                window.ethers = await loadEthers();
+                if (typeof window.ethereum === 'undefined') {
+                    showStatus('MetaMask not found. Please install MetaMask.', 'error');
+                    return;
+                }
+
+                showStatus('Connecting to MetaMask...', 'info');
+                
+                // Request account access
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                
+                const address = await signer.getAddress();
+                const balance = await provider.getBalance(address);
+                const network = await provider.getNetwork();
+                
+                isConnected = true;
+                wallet = { address, balance, network, type: 'metamask' };
+                
+                updateWalletDisplay();
+                showStatus('MetaMask connected successfully!', 'success');
+                
+            } catch (error) {
+                showStatus('Failed to connect MetaMask: ' + error.message, 'error');
+            }
+        }
+
+        // Create Omega Test Wallet
+        async function createOmegaWallet() {
+            try {
+                window.ethers = await loadEthers();
+                showStatus('Creating Omega Test Wallet...', 'info');
+                
+                // Create a new wallet
+                const newWallet = ethers.Wallet.createRandom();
+                
+                // Connect to Omega network
+                const OMEGA_RPC_URL = 'https://0x4e454228.rpc.aurora-cloud.dev';
+                const omegaProvider = new ethers.providers.JsonRpcProvider(OMEGA_RPC_URL);
+                const connectedWallet = newWallet.connect(omegaProvider);
+                
+                provider = omegaProvider;
+                signer = connectedWallet;
+                wallet = {
+                    address: newWallet.address,
+                    privateKey: newWallet.privateKey,
+                    balance: ethers.BigNumber.from(0),
+                    network: await omegaProvider.getNetwork(),
+                    type: 'omega'
+                };
+                
+                isConnected = true;
+                
+                updateWalletDisplay();
+                showStatus('Omega Test Wallet created successfully! Requesting funds from relayer...', 'info');
+                await fundOmegaWalletRelayer(newWallet.address);
+                
+                // Show private key section
+                document.getElementById('privateKeySection').classList.remove('hidden');
+                document.getElementById('privateKeyValue').textContent = newWallet.privateKey;
+                
+            } catch (error) {
+                showStatus('Failed to create Omega Wallet: ' + error.message, 'error');
+            }
+        }
+
+        // Helper to fund Omega wallet via relayer
+        async function fundOmegaWalletRelayer(address) {
+            try {
+                const response = await fetch('http://localhost:3000/fund', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ address, amount: '0.1' })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showStatus('✅ Your wallet is being funded! Tx: ' + data.txHash, 'success');
+                    showStatus('Please wait a few seconds before using your wallet.', 'info');
+                    setTimeout(updateWalletDisplay, 3000);
+                } else {
+                    showStatus('❌ Funding failed: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (err) {
+                showStatus('❌ Funding request failed: ' + err.message, 'error');
+            }
+        }
+
+        // Import private key
+        async function importPrivateKey() {
+            try {
+                window.ethers = await loadEthers();
+                const privateKeyInput = document.getElementById('privateKeyInput').value.trim();
+                
+                if (!privateKeyInput) {
+                    showStatus('Please enter a private key.', 'error');
+                    return;
+                }
+                
+                showStatus('Importing wallet...', 'info');
+                
+                // Add 0x prefix if missing
+                let privateKey = privateKeyInput;
+                if (!privateKey.startsWith('0x')) {
+                    privateKey = '0x' + privateKey;
+                }
+                
+                // Validate private key format
+                if (!/^0x[a-fA-F0-9]{64}$/.test(privateKey)) {
+                    showStatus('Invalid private key format. Must be 64 hex characters.', 'error');
+                    return;
+                }
+                
+                // Create wallet from private key
+                const importedWallet = new ethers.Wallet(privateKey);
+                
+                // Connect to Omega network
+                const OMEGA_RPC_URL = 'https://0x4e454228.rpc.aurora-cloud.dev';
+                const omegaProvider = new ethers.providers.JsonRpcProvider(OMEGA_RPC_URL);
+                const connectedWallet = importedWallet.connect(omegaProvider);
+                
+                provider = omegaProvider;
+                signer = connectedWallet;
+                wallet = {
+                    address: importedWallet.address,
+                    privateKey: importedWallet.privateKey,
+                    balance: await omegaProvider.getBalance(importedWallet.address),
+                    network: await omegaProvider.getNetwork(),
+                    type: 'omega'
+                };
+                
+                isConnected = true;
+                
+                updateWalletDisplay();
+                hideImportSection();
+                showStatus('Wallet imported successfully!', 'success');
+                
+                // Show private key section
+                document.getElementById('privateKeySection').classList.remove('hidden');
+                document.getElementById('privateKeyValue').textContent = importedWallet.privateKey;
+                
+            } catch (error) {
+                showStatus('Failed to import wallet: ' + error.message, 'error');
+            }
+        }
+
+        // Disconnect wallet
+        function disconnectWallet() {
+            provider = null;
+            signer = null;
+            wallet = null;
+            isConnected = false;
+            
+            // Hide wallet info
+            document.getElementById('walletInfo').classList.add('hidden');
+            document.getElementById('privateKeySection').classList.add('hidden');
+            
+            showStatus('Wallet disconnected.', 'info');
+        }
+
+        // Show import section
+        function showImportSection() {
+            document.getElementById('importSection').classList.remove('hidden');
+            document.getElementById('privateKeyInput').focus();
+        }
+
+        // Hide import section
+        function hideImportSection() {
+            document.getElementById('importSection').classList.add('hidden');
+            document.getElementById('privateKeyInput').value = '';
+        }
+
+        // Toggle private key visibility
+        function togglePrivateKey() {
+            const privateKeyValue = document.getElementById('privateKeyValue');
+            const revealBtn = document.getElementById('revealBtn');
+            
+            if (privateKeyValue.style.display === 'none' || !privateKeyValue.style.display) {
+                privateKeyValue.style.display = 'block';
+                revealBtn.textContent = '🙈 Hide Private Key';
+            } else {
+                privateKeyValue.style.display = 'none';
+                revealBtn.textContent = '👁️ Click to Reveal Private Key';
+            }
+        }
+
+        // Update wallet display
+        async function updateWalletDisplay() {
+            if (!wallet) return;
+            
+            try {
+                // Update balance
+                const balance = await provider.getBalance(wallet.address);
+                wallet.balance = balance;
+                
+                document.getElementById('walletStatus').textContent = 'Connected';
+                document.getElementById('walletAddress').textContent = wallet.address;
+                document.getElementById('walletBalance').textContent = ethers.utils.formatEther(balance) + ' OMEGA';
+                // Show 'Omega' for Omega network, otherwise use network name
+                let networkName = wallet.network && wallet.network.name ? wallet.network.name : 'Unknown';
+                const OMEGA_RPC_URL = 'https://0x4e454228.rpc.aurora-cloud.dev';
+                if ((provider && provider.connection && provider.connection.url && provider.connection.url.includes('aurora-cloud.dev')) || wallet.type === 'omega' || (provider && provider.connection && provider.connection.url === OMEGA_RPC_URL)) {
+                    networkName = 'Omega';
+                }
+                document.getElementById('walletNetwork').textContent = networkName;
+                
+                document.getElementById('walletInfo').classList.remove('hidden');
+                
+                // Update mining wallet balance if exists
+                if (miningWallet) {
+                    const miningBalance = await provider.getBalance(miningWallet.address);
+                    document.getElementById('miningBalance').textContent = ethers.utils.formatEther(miningBalance);
+                }
+                
+            } catch (error) {
+                console.error('Error updating wallet display:', error);
+            }
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showStatus('Copied to clipboard!', 'success');
+            }).catch(() => {
+                showStatus('Failed to copy to clipboard.', 'error');
+            });
+        }
+
+        // Claim from faucet
+        async function claimFromFaucet() {
+            if (!isConnected || !signer) {
+                showStatus('Please connect a wallet first.', 'error');
+                return;
+            }
+            
+            try {
+                showStatus('Claiming from faucet...', 'info');
+                
+                const faucetContract = new ethers.Contract(FAUCET_ADDRESS, FAUCET_ABI, signer);
+                const tx = await faucetContract.claim({ gasLimit: 100000 });
+                
+                showStatus('Transaction sent! Waiting for confirmation...', 'info');
+                await tx.wait();
+                
+                showStatus('Successfully claimed from faucet!', 'success');
+                updateWalletDisplay();
+                
+            } catch (error) {
+                showStatus('Faucet claim failed: ' + error.message, 'error');
+            }
+        }
+
+        // Fund mining wallet
+        async function fundMiningWallet() {
+            if (!isConnected || !signer) {
+                showStatus('Please connect a wallet first.', 'error');
+                return;
+            }
+            
+            if (!miningWallet) {
+                // Create mining wallet
+                miningWallet = ethers.Wallet.createRandom().connect(provider);
+                showStatus('Mining wallet created: ' + miningWallet.address, 'info');
+            }
+            
+            try {
+                const amount = ethers.utils.parseEther('0.002'); // 0.002 OMEGA for gas
+                
+                showStatus('Funding mining wallet...', 'info');
+                
+                const tx = await signer.sendTransaction({
+                    to: miningWallet.address,
+                    value: amount,
+                    gasLimit: 21000
+                });
+                
+                showStatus('Funding transaction sent! Waiting for confirmation...', 'info');
+                await tx.wait();
+                
+                showStatus('Mining wallet funded successfully!', 'success');
+                updateWalletDisplay();
+                
+            } catch (error) {
+                showStatus('Failed to fund mining wallet: ' + error.message, 'error');
+            }
+        }
+
+        // Matrix (falling 0s and 1s) effect for mining
+        let matrixInterval = null;
+        let matrixActive = false;
+        function startMatrixEffect() {
+            if (matrixActive) return;
+            matrixActive = true;
+            const leftCanvas = document.getElementById('leftMatrixCanvas');
+            const rightCanvas = document.getElementById('rightMatrixCanvas');
+            leftCanvas.width = 80; leftCanvas.height = window.innerHeight;
+            rightCanvas.width = 80; rightCanvas.height = window.innerHeight;
+            leftCanvas.style.display = 'block';
+            rightCanvas.style.display = 'block';
+            // Matrix columns
+            const fontSize = 22;
+            const columns = Math.floor(leftCanvas.width / fontSize);
+            const dropsL = Array(columns).fill(0);
+            const dropsR = Array(columns).fill(0);
+            function drawMatrix(ctx, drops) {
+                ctx.fillStyle = 'rgba(0,0,0,0.15)';
+                ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.font = fontSize + 'px monospace';
+                ctx.fillStyle = '#fff';
+                for (let i = 0; i < drops.length; i++) {
+                    const text = Math.random() > 0.5 ? '0' : '1';
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    if (Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                    if (drops[i] * fontSize > ctx.canvas.height) drops[i] = 0;
+                }
+            }
+            matrixInterval = setInterval(() => {
+                drawMatrix(leftCanvas.getContext('2d'), dropsL);
+                drawMatrix(rightCanvas.getContext('2d'), dropsR);
+            }, 60);
+        }
+        function stopMatrixEffect() {
+            matrixActive = false;
+            clearInterval(matrixInterval);
+            document.getElementById('leftMatrixCanvas').style.display = 'none';
+            document.getElementById('rightMatrixCanvas').style.display = 'none';
+        }
+
+        // Mining status panel animation
+        let miningStatusInterval = null;
+        function startMiningStatusPanel() {
+            const panel = document.getElementById('miningStatusPanel');
+            if (panel) panel.style.display = 'flex';
+            function randomHash() {
+                const chars = 'abcdef0123456789';
+                let h = '0x';
+                for (let i = 0; i < 16; i++) h += chars[Math.floor(Math.random()*chars.length)];
+                return h;
+            }
+            function randomPercent(min, max) {
+                return (Math.random() * (max-min) + min).toFixed(1) + '%';
+            }
+            function randomRam() {
+                const gb = Math.random() > 0.5;
+                if (gb) return (Math.random()*8+4).toFixed(2) + ' GB';
+                return (Math.random()*900+100).toFixed(0) + ' MB';
+            }
+            function randomWatts() {
+                return (Math.random()*200+100).toFixed(0) + ' W';
+            }
+            function update() {
+                document.getElementById('miningHashValue').textContent = randomHash();
+                document.getElementById('cpuValue').textContent = randomPercent(12, 99);
+                document.getElementById('ramValue').textContent = randomRam();
+                document.getElementById('elecValue').textContent = randomWatts();
+            }
+            update();
+            miningStatusInterval = setInterval(update, 1000);
+        }
+        function stopMiningStatusPanel() {
+            const panel = document.getElementById('miningStatusPanel');
+            if (panel) panel.style.display = 'none';
+            if (miningStatusInterval) clearInterval(miningStatusInterval);
+        }
+
+        // Add this before window.startMining so it's always in scope
+        function generateRandomSolution() {
+            const chars = '0123456789abcdef';
+            let solution = '0x';
+            for (let i = 0; i < 64; i++) {
+                solution += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return solution;
+        }
+
+        // Define mining functions on window so they are always global
+        window.startMining = async function() {
+            if (!isConnected || !signer) {
+                showStatus('Please connect a wallet first.', 'error');
+                return;
+            }
+            if (!miningWallet) {
+                // Create mining wallet
+                miningWallet = ethers.Wallet.createRandom().connect(provider);
+                showStatus('Mining wallet created: ' + miningWallet.address, 'info');
+            }
+            try {
+                const minGas = ethers.utils.parseEther('0.002');
+                const miningContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, miningWallet);
+                // Wait for funding before starting mining
+                const checkAndStartMining = async () => {
+                    const balance = await provider.getBalance(miningWallet.address);
+                    if (balance.gte(minGas)) {
+                        isMining = true;
+                        mineCount = 0;
+                        showStatus('Mining started successfully!', 'success');
+                        startMatrixEffect();
+                        startMiningStatusPanel();
+                        miningInterval = setInterval(async () => {
+                            if (!isMining) return;
+                            try {
+                                mineCount++;
+                                const nonce = mineCount;
+                                const solution = generateRandomSolution();
+                                const tx = await miningContract.mineBlock(nonce, solution, { gasLimit: 200000 });
+                                await tx.wait();
+                                // Fetch actual on-chain total mined
+                                const minerInfo = await miningContract.getMinerInfo(miningWallet.address);
+                                const totalMined = ethers.utils.formatEther(minerInfo[0]);
+                                document.getElementById('blocksMined').textContent = mineCount;
+                                document.getElementById('totalEarned').textContent = totalMined + ' OMEGA';
+                                showStatus(`Block ${mineCount} mined!`, 'success');
+                            } catch (error) {
+                                showStatus(`Mining error: ${error.message}`, 'error');
+                            }
+                        }, 15000);
+                    } else {
+                        showStatus('Waiting for mining wallet to be funded with at least 0.002 OMEGA...', 'info');
+                        setTimeout(checkAndStartMining, 3000);
+                    }
+                };
+                checkAndStartMining();
+            } catch (error) {
+                isMining = false;
+                showStatus('Failed to start mining: ' + error.message, 'error');
+            }
+        };
+        window.stopMining = function() {
+            if (!isMining) {
+                showStatus('Mining is not running.', 'warning');
+                return;
+            }
+            isMining = false;
+            if (miningInterval) {
+                clearInterval(miningInterval);
+                miningInterval = null;
+            }
+            stopMatrixEffect();
+            stopMiningStatusPanel();
+            showStatus('Mining stopped.', 'info');
+        };
+
+        // Show status message
+        function showStatus(message, type = 'info') {
+            const statusContainer = document.getElementById('statusContainer');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            
+            statusContainer.appendChild(statusDiv);
+            
+            // Remove status after 5 seconds
+            setTimeout(() => {
+                if (statusDiv.parentNode) {
+                    statusDiv.parentNode.removeChild(statusDiv);
+                }
+            }, 5000);
+        }
+
+        // Listen for MetaMask account changes
+        if (typeof window.ethereum !== 'undefined') {
+            window.ethereum.on('accountsChanged', function (accounts) {
+                if (accounts.length === 0) {
+                    disconnectWallet();
+                } else {
+                    connectMetaMask();
+                }
+            });
+        }
+
+        // Collapse/Expand Wallet Info logic
+        let walletCollapsed = false;
+        function updateWalletCollapseUI() {
+            const walletCollapseBtn = document.getElementById('walletCollapseBtn');
+            const walletInfo = document.getElementById('walletInfo');
+            const importSection = document.getElementById('importSection');
+            if (walletCollapseBtn) {
+                if (walletCollapsed) {
+                    walletCollapseBtn.textContent = '▲';
+                    if (walletInfo) walletInfo.classList.add('hidden');
+                    if (importSection) importSection.classList.add('hidden');
+                } else {
+                    walletCollapseBtn.textContent = '▼';
+                    if (walletInfo) walletInfo.classList.remove('hidden');
+                    // Only show importSection if it was open before
+                    if (importSection && !importSection.classList.contains('hidden')) importSection.classList.remove('hidden');
+                }
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const walletCollapseBtn = document.getElementById('walletCollapseBtn');
+            if (walletCollapseBtn) {
+                walletCollapseBtn.addEventListener('click', function() {
+                    walletCollapsed = !walletCollapsed;
+                    updateWalletCollapseUI();
+                });
+            }
+        });
+
+        // Faucet status button logic
+        async function showFaucetStatus() {
+            if (!isConnected || !signer) {
+                showStatus('Please connect a wallet first.', 'error');
+                return;
+            }
+            try {
+                const faucetStatusMsg = document.getElementById('faucetStatusMsg');
+                faucetStatusMsg.textContent = 'Fetching faucet status...';
+                const faucetContract = new ethers.Contract(FAUCET_ADDRESS, FAUCET_ABI, signer);
+                const address = wallet.address;
+                const info = await faucetContract.getFaucetStatus(address);
+                const canClaim = info.canClaimNow;
+                const lastClaim = info.lastClaim;
+                const timeUntil = info.timeUntilNextClaim;
+                const claimAmount = info.claimAmount;
+                const faucetBalance = info.faucetBalance;
+                let msg = '';
+                msg += canClaim ? '✅ You can claim from the faucet now.\n' : '⏳ You cannot claim yet.\n';
+                if (!canClaim) {
+                    const mins = Math.floor(timeUntil / 60);
+                    const secs = timeUntil % 60;
+                    msg += `Time until next claim: ${mins}m ${secs}s\n`;
+                }
+                msg += `Faucet balance: ${ethers.utils.formatEther(faucetBalance)} OMEGA\n`;
+                msg += `Claim amount: ${ethers.utils.formatEther(claimAmount)} OMEGA`;
+                faucetStatusMsg.textContent = msg;
+            } catch (error) {
+                document.getElementById('faucetStatusMsg').textContent = 'Failed to fetch faucet status: ' + error.message;
+            }
+        }
+
+        // Claim mining rewards from mining wallet to connected wallet
+        window.claimMiningRewards = async function() {
+            if (!isConnected || !signer) {
+                showStatus('Please connect a wallet first.', 'error');
+                return;
+            }
+            if (!miningWallet) {
+                showStatus('No mining wallet found. Start mining first.', 'error');
+                return;
+            }
+            try {
+                showStatus('Claiming mining rewards...', 'info');
+                const miningContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, miningWallet);
+                const userAddress = wallet.address;
+                const minerInfo = await miningContract.getMinerInfo(miningWallet.address);
+                const pendingRewards = minerInfo[2];
+                if (pendingRewards.isZero()) {
+                    showStatus('No pending rewards to claim.', 'warning');
+                    return;
+                }
+                // Check mining wallet balance for gas
+                const balance = await provider.getBalance(miningWallet.address);
+                const gasPrice = await provider.getGasPrice();
+                const gasLimit = 100000;
+                const minClaimGas = ethers.utils.parseEther('0.002');
+                const estimatedGas = gasPrice.mul(gasLimit);
+                if (balance.lt(minClaimGas)) {
+                    showStatus('Not enough OMEGA in mining wallet to pay gas for claim. Please fund it with at least 0.002 OMEGA.', 'warning');
+                    return;
+                }
+                const claimTx = await miningContract.claimTo(userAddress, { gasLimit });
+                await claimTx.wait();
+                showStatus('Rewards claimed successfully!', 'success');
+                updateWalletDisplay();
+                // After claim, update total earned
+                try {
+                    const miningContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+                    const minerInfo = await miningContract.getMinerInfo(miningWallet.address);
+                    const totalMined = ethers.utils.formatEther(minerInfo[0]);
+                    document.getElementById('totalEarned').textContent = totalMined + ' OMEGA';
+                } catch (err) {
+                    showStatus('Failed to update total earned after claim.', 'error');
+                }
+            } catch (error) {
+                showStatus('Claim failed: ' + error.message, 'error');
+            }
+        };
+    </script>
+</body>
+</html> 
