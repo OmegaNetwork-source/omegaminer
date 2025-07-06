@@ -198,13 +198,12 @@
         }
 
         .private-key-value {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 10px;
-            border-radius: 6px;
             font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            color: #ff4444;
+            font-size: 0.8em;
             word-break: break-all;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
             margin-top: 10px;
             display: none;
         }
@@ -251,32 +250,32 @@
         .status {
             padding: 15px;
             border-radius: 8px;
-            margin: 15px 0;
+            margin: 10px 0;
             font-weight: 500;
         }
 
         .status.success {
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            color: #00ff88;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #00ff00;
         }
 
         .status.error {
-            background: rgba(255, 68, 68, 0.1);
-            border: 1px solid rgba(255, 68, 68, 0.3);
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
             color: #ff4444;
         }
 
         .status.info {
-            background: rgba(0, 204, 255, 0.1);
-            border: 1px solid rgba(0, 204, 255, 0.3);
+            background: rgba(0, 150, 255, 0.1);
+            border: 1px solid rgba(0, 150, 255, 0.3);
             color: #00ccff;
         }
 
         .status.warning {
-            background: rgba(255, 193, 7, 0.1);
-            border: 1px solid rgba(255, 193, 7, 0.3);
-            color: #ffc107;
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            color: #ffaa00;
         }
 
         .hidden {
@@ -416,6 +415,268 @@
             margin-bottom: 0;
             text-align: center;
             display: block;
+        }
+
+        /* Mobile and Tablet Optimizations */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                max-width: 100%;
+            }
+
+            .header {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+                line-height: 1.2;
+            }
+
+            .header p {
+                font-size: 1em;
+            }
+
+            .wallet-section {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            .wallet-section h2 {
+                font-size: 1.3em;
+                margin-bottom: 15px;
+            }
+
+            .wallet-buttons {
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            .btn {
+                padding: 14px 20px;
+                font-size: 16px;
+                min-height: 44px;
+                min-width: 44px;
+                justify-content: center;
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .wallet-info {
+                padding: 15px;
+                margin-top: 15px;
+            }
+
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+                padding: 12px 0;
+            }
+
+            .info-value {
+                font-size: 0.8em;
+                width: 100%;
+                word-break: break-all;
+            }
+
+            .copy-btn {
+                padding: 8px 12px;
+                font-size: 14px;
+                margin-left: 0;
+                margin-top: 5px;
+                min-height: 36px;
+            }
+
+            .private-key-section {
+                padding: 12px;
+                margin-top: 12px;
+            }
+
+            .reveal-btn {
+                padding: 12px 20px;
+                font-size: 16px;
+                min-height: 44px;
+                width: 100%;
+            }
+
+            .private-key-value {
+                font-size: 0.7em;
+                padding: 8px;
+            }
+
+            .status {
+                padding: 12px;
+                font-size: 14px;
+                margin: 8px 0;
+            }
+
+            /* Mining section mobile optimizations */
+            .mining-section {
+                padding: 20px;
+            }
+
+            .mining-section h2 {
+                font-size: 1.3em;
+            }
+
+            .mining-buttons {
+                gap: 10px;
+                flex-direction: column;
+            }
+
+            .mining-buttons .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .centered-action-group {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .step-label {
+                font-size: 11px;
+                margin-top: 5px;
+            }
+
+            /* Statistics grid mobile */
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .balance-display {
+                font-size: 1.8em;
+            }
+
+            .balance-label {
+                font-size: 0.9em;
+            }
+
+            /* Input fields mobile */
+            input[type="text"], input[type="password"] {
+                padding: 12px;
+                font-size: 16px;
+                min-height: 44px;
+            }
+
+            /* Collapse/expand button mobile */
+            .collapse-btn {
+                padding: 8px 12px;
+                font-size: 14px;
+                min-height: 36px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 12px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .wallet-section, .mining-section {
+                padding: 15px;
+            }
+
+            .btn {
+                padding: 12px 16px;
+                font-size: 15px;
+                min-width: 100px;
+            }
+
+            .wallet-buttons {
+                flex-direction: column;
+            }
+
+            .wallet-buttons .btn {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+
+            .info-row {
+                padding: 10px 0;
+            }
+
+            .info-value {
+                font-size: 0.75em;
+            }
+
+            .balance-display {
+                font-size: 1.6em;
+            }
+
+            .status {
+                padding: 10px;
+                font-size: 13px;
+            }
+        }
+
+        /* Touch-friendly hover states for mobile */
+        @media (hover: none) and (pointer: coarse) {
+            .btn:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .btn:active {
+                transform: scale(0.98);
+                opacity: 0.8;
+            }
+
+            .copy-btn:hover {
+                background: rgba(255,255,255,0.2);
+            }
+
+            .copy-btn:active {
+                background: rgba(255,255,255,0.3);
+                transform: scale(0.95);
+            }
+
+            .reveal-btn:hover {
+                background: rgba(255,255,255,0.2);
+            }
+
+            .reveal-btn:active {
+                background: rgba(255,255,255,0.3);
+                transform: scale(0.98);
+            }
+        }
+
+        /* Landscape orientation adjustments */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .wallet-buttons {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .wallet-buttons .btn {
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .mining-buttons {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .mining-buttons .btn {
+                flex: 1;
+                min-width: 120px;
+            }
         }
     </style>
 </head>
