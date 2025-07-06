@@ -1,0 +1,32 @@
+{
+  "name": "omega-relayer-faucet",
+  "version": "1.0.0",
+  "description": "Omega Network Faucet & API Relayer Backend",
+  "main": "relayer-faucet.js",
+  "scripts": {
+    "start": "node relayer-faucet.js",
+    "dev": "nodemon relayer-faucet.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ethers": "^5.7.2",
+    "dotenv": "^16.0.3",
+    "cors": "^2.8.5",
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "omega",
+    "blockchain",
+    "relayer",
+    "faucet",
+    "api"
+  ],
+  "author": "Omega Network",
+  "license": "MIT"
+} 
